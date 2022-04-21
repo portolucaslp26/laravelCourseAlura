@@ -2,6 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SeriesController;
+use App\Http\Controllers\SessionsController;
+use App\Http\Controllers\EpisodesController;
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +27,13 @@ Route::post('series/create', [SeriesController::class, 'store'])
 
 Route::delete('series/delete/{id}', [SeriesController::class, 'destroy'])
     ->name('delete_serie');
+
+Route::get('series/{id}/sessions', [SessionsController::class, 'index']);
+
+Route::post('series/{id}/editSerie', [SeriesController::class, 'editSerie']);
+
+Route::get('sessions/{session}/episodes', [EpisodesController::class, 'index']);
+Route::post('sessions/{session}/episodes/visualized', [EpisodesController::class, 'toView']);
+
+
+

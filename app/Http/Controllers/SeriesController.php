@@ -3,8 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\SerieRequest;;
+use App\Http\Requests\SerieRequest;
+use App\Models\Episode;
+
+;
 use App\Models\Serie;
+use App\Models\Session;
+use App\Services\SerieCreator;
+use App\Services\SerieRemover;
 
 class SeriesController extends Controller
 {
@@ -39,12 +45,14 @@ class SeriesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(SerieRequest $request)
+    public function store(SerieRequest $request, SerieCreator $serieCreator)
     {
-        $name = $request->name;
-        $serie = Serie::create([
-            'name' => $name
-        ]);
+        $serie = $serieCreator->createSerie(
+            $request->name,
+            $request->number_session,
+            $request->number_episode
+        );
+
         $request->session()
                 ->flash(
                     'message',
@@ -94,16 +102,23 @@ class SeriesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function destroy(Request $request, SerieRemover $serieRemover)
     {
-        Serie::destroy($request->id);
-
+        $serieName = $serieRemover->serieRemove($request->id);
         $request->session()
         ->flash(
             'message',
-            "Série removida com sucesso!"
+            "Série $serieName removida com sucesso!"
         );
 
         return redirect('/series');
+    }
+
+    public function editSerie($id, Request $request)
+    {
+        $newName = $request->name;
+        $serie = Serie::find($id);
+        $serie->name = $newName;
+        $serie->save();
     }
 }
